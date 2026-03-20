@@ -8,7 +8,9 @@ tags: locators, data-testid, exceptions
 
 **Impact: CRITICAL**
 
-`data-testid` is a last resort, not a default. It couples tests to an attribute that exists purely for testing — a parallel naming system that drifts from the real UI and breaks the principle of locating elements by what they are. The only valid use case is asserting on state that has no user-facing representation: scroll position, animation phase, internal layout state. If you reach for `data-testid`, first ask whether the element can be found by its role and name instead.
+**Why:** `data-testid` is a parallel naming system — it exists purely for testing and drifts from the real UI over time. Every `data-testid` you add is a maintenance liability that bypasses the principle of finding elements by what they are. The only valid use case is asserting on state that has no user-facing representation: scroll position, animation phase, internal layout state. If an element has a role and a name, there's no reason to reach for `data-testid`.
+
+**How:** Before adding `data-testid`, ask: "Can this element be found by its role and accessible name?" If yes, use that. Reserve `data-testid` exclusively for non-visible state.
 
 **Incorrect (data-testid for an element that has a role):**
 

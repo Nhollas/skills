@@ -7,28 +7,26 @@
       "expected_output": "A test file using Vitest browser mode with MSW handlers, page object, fixtures, factory functions, and role-based locators",
       "files": ["evals/files/UserList.tsx"],
       "expectations": [
-        "Uses getByRole() for locating elements, not CSS selectors or data-testid",
+        "Locates elements by role within scoped UI regions, not CSS selectors or data-testid",
         "Uses browserWorker.use() for per-test API handlers",
         "Page object uses Object.assign(page, self) pattern",
         "Page object methods follow get*/expect*/action naming convention",
-        "Uses test.extend<T>() for typed fixtures",
+        "Uses the Vitest builder pattern (.extend('name', ...)) or test.extend for typed fixtures",
         "Test names describe observable user behavior, not implementation details",
         "Uses a factory function (e.g. createUser()) with overridable defaults for test data",
-        "User item locators scope within the list region (not querying page directly)",
-        "MSW handlers are extracted into separate reusable handler functions"
+        "Happy-path MSW handlers are defined in a shared handlers module, not inlined in every test"
       ]
     },
     {
       "id": 2,
       "prompt": "This TaskBoard component needs tests — it has filtering by priority and three status columns (todo, in-progress, done). The component is at evals/files/TaskBoard.tsx.",
-      "expected_output": "A test file with scoped locators for different columns, dynamic aria-label handling, page object with scoped locators, and fixture composition",
+      "expected_output": "A test file with scoped locators for different columns, page object with scoped locators, and fixture composition",
       "files": ["evals/files/TaskBoard.tsx"],
       "expectations": [
         "Locators chain through parent regions to scope queries within different columns",
-        "Suggests semantic markup improvements (e.g. section with aria-label instead of div)",
-        "Suggests dynamic aria-label for task cards based on their content or status",
+        "Suggests markup improvements where needed to make elements queryable by role",
         "Page object uses self-referencing scoped locators (self.getColumn() pattern)",
-        "Fixtures use composition with dependency declarations or auto: true"
+        "Fixtures compose through the extension chain (e.g. page object fixture depends on render fixture)"
       ]
     },
     {
@@ -46,27 +44,24 @@
     {
       "id": 4,
       "prompt": "Write tests for this NotificationPanel — it shows a list of notifications with read/unread status, has a bell icon with a badge count, and auto-scrolls to new notifications. The component is at evals/files/NotificationPanel.tsx.",
-      "expected_output": "A test file that hides decorative icons with aria-hidden, uses data-testid only for the scroll container state, computes dynamic aria-labels for notification items, and uses factory functions for notification data",
+      "expected_output": "A test file that uses data-testid only for the scroll container state, locates notifications by role, and uses factory functions for notification data",
       "files": ["evals/files/NotificationPanel.tsx"],
       "expectations": [
-        "Suggests or uses aria-hidden=\"true\" for decorative icons (BellIcon, CheckIcon)",
         "Uses data-testid only for the scroll container's non-visible state (not for locating regular UI elements)",
-        "Suggests dynamic aria-label for notification items based on content (e.g. notification title)",
-        "Suggests semantic HTML elements instead of plain divs for notification structure",
+        "Locates notification items by role and accessible name, not CSS selectors",
         "Uses a factory function (e.g. createNotification()) with overridable defaults for test data"
       ]
     },
     {
       "id": 5,
       "prompt": "Write tests for this Dashboard component. It has a sidebar with navigation and a main content panel — both contain lists and headings that could clash. I want separate fixture files for the sidebar and main content areas. The component is at evals/files/Dashboard.tsx.",
-      "expected_output": "Multiple files: separate fixture files per feature area, page objects with scoped locators for sidebar vs main content, and fixture composition with dependency declarations",
+      "expected_output": "Multiple files: separate fixture files per feature area, page objects with scoped locators for sidebar vs main content",
       "files": ["evals/files/Dashboard.tsx"],
       "expectations": [
-        "Creates separate fixture files for sidebar and main content areas",
+        "Creates separate fixture files for sidebar and main content that extend from a shared base or independently render",
         "Sidebar page object scopes locators within the sidebar region",
         "Main content page object scopes locators within the main content region",
-        "Locators chain through parent regions to avoid cross-region clashes between lists/headings",
-        "Fixtures use composition with dependency declarations"
+        "Locators chain through parent regions to avoid cross-region clashes between lists/headings"
       ]
     },
     {

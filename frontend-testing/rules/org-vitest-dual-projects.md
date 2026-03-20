@@ -8,7 +8,9 @@ tags: organization, vitest, config, projects, browser
 
 **Impact: MEDIUM**
 
-Configure two vitest projects: one for unit tests (Node, fast) and one for browser tests (Playwright, full DOM). The file extension routes tests to the correct project automatically. This means pure logic tests run at Node speed while component tests get a real browser.
+**Why:** Pure logic tests don't need a browser — running them in Node is faster and has less overhead. Component tests need a real DOM and browser APIs. Forcing everything through the browser slows down the feedback loop; running everything in Node means component tests miss real browser behavior. The right split gives each test type the environment it needs.
+
+**How:** Configure two vitest projects: `unit` (Node, `*.test.ts`) and `browser` (Playwright, `*.test.tsx`). The file extension routes tests to the correct project automatically.
 
 **Incorrect (single project forces all tests through the browser):**
 

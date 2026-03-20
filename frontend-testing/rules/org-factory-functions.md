@@ -1,14 +1,16 @@
 ---
 title: Use Factory Functions with Overridable Defaults
 impact: MEDIUM
-tags: organization, factories, test-data, defaults
+tags: organization, factories, test-data, defaults, synthetic-data
 ---
 
 ## Use Factory Functions with Overridable Defaults
 
 **Impact: MEDIUM**
 
-Factory functions produce valid test objects with sensible defaults, letting each test only specify the fields that matter for its scenario. This keeps tests focused and avoids the noise of constructing full objects with irrelevant properties.
+**Why:** Tests should use synthetic data, not real data — this avoids privacy concerns and makes tests repeatable. But constructing full objects in every test buries the scenario under noise. Factory functions produce valid synthetic objects with sensible defaults, letting each test only specify the fields that matter for its scenario. This keeps tests focused and makes it obvious what's being tested.
+
+**How:** Create factory functions that return valid objects with overridable defaults via spread. Keep factories local to the test file when only used there; extract to the shared support directory when used across files.
 
 **Incorrect (full object construction in every test):**
 
@@ -50,5 +52,3 @@ test("shows badge for viewer role", async () => {
   render(<UserCard user={createUser({ role: "viewer" })} />);
 });
 ```
-
-Keep factories local to the test file when only used there. Extract to the shared support directory when used across files.

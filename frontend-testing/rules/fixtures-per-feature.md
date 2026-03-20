@@ -1,47 +1,69 @@
 ---
-title: Create Fixture Files Per Feature Area
+title: Extend the Fixture Chain Per Feature
 impact: HIGH
-tags: fixtures, organization, features, separation
+tags: fixtures, organization, features, extension-chain
 ---
 
-## Create Fixture Files Per Feature Area
+## Extend the Fixture Chain Per Feature
 
 **Impact: HIGH**
 
-Each major feature area gets its own fixture file. This prevents a single monolithic fixture that grows to include every possible setup. Feature fixtures can share common infrastructure (MSW worker, browser setup) through the global setup while keeping feature-specific concerns isolated.
+**Why:** A single monolithic fixture chain that defines every page object and setup in one place creates coupling between unrelated features. But creating completely independent fixture files duplicates shared setup (rendering, MSW, etc.). The extension chain solves this naturally — define shared infrastructure once, then extend it per feature.
 
-**Incorrect (one fixture file for everything):**
+**How:** Create a base fixture chain with shared infrastructure, then import and extend it in feature-specific fixture files. Each feature adds only its own page object to the chain. Tests import from their feature's fixture file.
+
+**Incorrect (one file defines everything):**
 
 ```typescript
+// test-fixtures.tsx — grows unbounded
+export const test = base
+  .extend("dashboardPage", async () => { /* ... */ })
+  .extend("settingsPage", async () => { /* ... */ })
+  .extend("adminPage", async () => { /* ... */ });
+```
+
+**Correct (shared base, extended per feature):**
+
+```typescript
+// base-fixture.tsx — shared rendering infrastructure
 import { test as base } from "vitest";
 
-// fixtures.tsx — grows unbounded
-export const test = base.extend<{
-  dashboardPage: DashboardPageObject;
-  settingsPage: SettingsPageObject;
-  adminPage: AdminPageObject;
-  apiMock: ApiMock;
-  authToken: string;
-  // ...50 more fixtures
-}>({ /* ... */ });
+export const test = base
+  .extend("app", async ({}, { onCleanup }) => {
+    const result = render(<App />);
+    onCleanup(() => result.unmount());
+    return page;
+  });
 ```
 
-**Correct (separate fixture files per feature):**
+```typescript
+// dashboard-fixture.tsx — extends the chain with feature-specific fixtures
+import { test as base } from "./base-fixture";
 
+export const test = base
+  .extend("dashboardPage", async ({ app }) => {
+    return dashboardPageObject(app);
+  });
 ```
-dashboard-page-fixture.tsx     # Dashboard feature fixtures
-dashboard-page-object.ts       # Dashboard page object
-settings-page-fixture.tsx      # Settings feature fixtures
-settings-page-object.ts        # Settings page object
-msw.ts                         # Shared MSW worker + resolvers
+
+```typescript
+// settings-fixture.tsx — same base, different feature
+import { test as base } from "./base-fixture";
+
+export const test = base
+  .extend("settingsPage", async ({ app }) => {
+    return settingsPageObject(app);
+  });
 ```
 
 Each test file imports from its feature's fixture:
 
 ```typescript
-// In a dashboard test file:
-import { test } from "<path-to>/dashboard-page-fixture";
+import { test, expect } from "./dashboard-fixture";
 
-// In a settings test file:
-import { test } from "<path-to>/settings-page-fixture";
+test("displays project list", async ({ dashboardPage }) => {
+  await dashboardPage.expectProjectsVisible();
+});
 ```
+
+The shared base handles rendering and cleanup once. Features only add what's unique to them.

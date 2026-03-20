@@ -8,7 +8,9 @@ tags: page-objects, naming, locators, expectations, actions
 
 **Impact: HIGH**
 
-Page objects should use a consistent prefix convention so anyone reading a test immediately knows what a method does without checking the page object source. Three prefixes cover every method type.
+**Why:** When tests read like behavior specifications, anyone can understand what they do at a glance. Inconsistent page object method names force readers to check the source to figure out whether a method returns a locator, performs an assertion, or triggers an action. A consistent prefix convention removes that friction.
+
+**How:** Three prefixes cover every method type: `get*` returns a locator (no awaiting, no assertions), `expect*` asserts a condition (always awaited), and imperative verbs (`sendMessage`, `selectFilter`) perform user interactions.
 
 **Incorrect (inconsistent naming blurs intent):**
 

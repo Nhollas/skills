@@ -1,14 +1,16 @@
 ---
-title: Use test.extend<T>() for Typed Composable Fixtures
+title: Use the Builder Pattern for Typed Fixtures
 impact: HIGH
-tags: fixtures, vitest, test.extend, typing
+tags: fixtures, vitest, test.extend, typing, builder
 ---
 
-## Use test.extend<T>() for Typed Composable Fixtures
+## Use the Builder Pattern for Typed Fixtures
 
 **Impact: HIGH**
 
-Vitest's `test.extend<T>()` creates typed fixtures that are available as destructured arguments in every test. This replaces fragile `beforeEach`/`afterEach` chains with declarative setup that's type-checked and automatically cleaned up. Fixtures only run when a test actually uses them.
+**Why:** `beforeEach`/`afterEach` chains create implicit ordering and shared mutable state — when something breaks, you have to trace through hook execution order to understand what happened. Declarative fixtures make dependencies explicit, only run when a test actually uses them, and clean up automatically.
+
+**How:** Use Vitest's builder pattern (`.extend('name', ...)`) to create fixtures with automatic type inference. Each `.extend()` call adds one fixture, and the return type is inferred from the function — no manual interface needed.
 
 **Incorrect (manual setup/teardown in hooks):**
 
@@ -21,22 +23,27 @@ beforeEach(async () => {
 });
 ```
 
-**Correct (fixtures handle setup declaratively):**
+**Correct (builder pattern with automatic type inference):**
 
 ```typescript
 import { test as base } from "vitest";
 
-export interface MyPageFixtures {
-  myPage: MyPageObject;
-}
-
-export const test = base.extend<MyPageFixtures>({
-  // biome-ignore lint/correctness/noEmptyPattern: Vitest fixtures require destructuring
-  myPage: async ({}, use) => {
+export const test = base
+  .extend("myPage", async () => {
     await render(<MyComponent />);
-    await use(myPageObject(page));
-  },
-});
+    return myPageObject(page);
+  });
+```
+
+When a fixture needs cleanup, use the `onCleanup` callback:
+
+```typescript
+export const test = base
+  .extend("myPage", async ({}, { onCleanup }) => {
+    const result = render(<MyComponent />);
+    onCleanup(() => result.unmount());
+    return myPageObject(page);
+  });
 ```
 
 Export both `test` and `expect` from the fixture file so tests have a single import source.

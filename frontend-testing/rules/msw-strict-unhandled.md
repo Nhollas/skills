@@ -1,14 +1,16 @@
 ---
 title: Use onUnhandledRequest "error"
 impact: CRITICAL
-tags: msw, unhandled, strict, network
+tags: msw, unhandled, strict, network, moto
 ---
 
 ## Use onUnhandledRequest "error"
 
 **Impact: CRITICAL**
 
-Every network request in tests must be explicitly accounted for. Setting `onUnhandledRequest: "error"` ensures that if a component makes an unexpected API call, the test fails immediately with a clear error rather than hanging, timing out, or producing confusing results. This catches missing handlers, typos in URLs, and unintended side effects.
+**Why:** The MOTO principle says mock at the boundary — but that only works if every boundary interaction is accounted for. If an unhandled request silently falls through, the test can hang, timeout, or produce confusing results without ever telling you a handler is missing. Strict mode turns that silent failure into an immediate, clear error.
+
+**How:** Setting `onUnhandledRequest: "error"` on the MSW worker means any HTTP request without a matching handler fails the test instantly. This catches missing handlers, URL typos, and unintended side effects.
 
 **Incorrect (silent fallthrough hides missing handlers):**
 

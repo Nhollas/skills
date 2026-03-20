@@ -1,34 +1,39 @@
 ---
-title: Use getByRole with Accessible Names
+title: Locate Elements by Role Within UI Regions
 impact: CRITICAL
-tags: locators, getByRole, resilience, roles
+tags: locators, getByRole, scoping, regions, markup, resilience
 ---
 
-## Use getByRole with Accessible Names
+## Locate Elements by Role Within UI Regions
 
 **Impact: CRITICAL**
 
-Locators built on roles and accessible names are decoupled from markup implementation. CSS selectors break when class names change, tag selectors break when element types change, and `data-testid` creates a parallel naming system that has to be maintained alongside the real UI. Role-based locators survive all of these refactors because they describe what an element *is*, not how it's implemented. They force you to think about elements from a user's perspective — if a user would call it a button, the test finds it as a button. Better accessibility is a bonus, not the goal.
+**Why:** Tests should query elements the same way a user finds them — by what they are and where they are on the page. A user doesn't think "click the element with class `btn-primary`", they think "click the Submit button in the contact form." Locators that mirror this mental model survive refactors, because markup implementation can change while the role and region stay the same.
 
-**Incorrect (coupled to markup implementation):**
+**How:** Combine `getByRole` with region scoping. First find the region, then find the element within it. This prevents false matches when the same role appears in multiple parts of the page (e.g., lists in both a sidebar and main content area).
+
+**Incorrect (unscoped, coupled to implementation):**
 
 ```typescript
 // CSS selector — breaks when class names change
-page.locator(".search-bar input")
+page.locator(".sidebar .task-list li")
 
-// data-testid — parallel naming system that drifts from the real UI
-page.locator("[data-testid='search-input']")
-
-// Tag selector — breaks when element type changes
-page.locator("input")
+// Unscoped role — could match items in sidebar, footer, or main content
+page.getByRole("listitem", { name: "Settings" })
 ```
 
-**Correct (locators describe what the element is, not how it's built):**
+**Correct (scoped by region, located by role):**
 
 ```typescript
-page.getByRole("searchbox", { name: "Search" })
-page.getByRole("button", { name: "Submit" })
+// Find the region first, then the element within it
 page.getByRole("navigation", { name: "Main menu" })
-page.getByRole("list", { name: "Search results" })
-page.getByRole("complementary", { name: "Sidebar" })
+    .getByRole("listitem", { name: "Settings" })
+
+// Deeper scoping for complex layouts
+page.getByRole("region", { name: "Recent orders" })
+    .getByRole("list")
+    .getByRole("listitem")
+    .filter({ hasText: "Order #1234" })
 ```
+
+**When markup doesn't support this:** If a component uses plain `<div>`s without semantic roles or accessible names, suggest targeted improvements — use semantic elements (`section`, `nav`, `ul`, `article`), add `aria-label` for regions, and compute labels from data for dynamic content. Keep suggestions minimal: only what's needed to make the locator strategy work.

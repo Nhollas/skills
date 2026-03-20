@@ -8,7 +8,9 @@ tags: organization, naming, behavior, readability
 
 **Impact: MEDIUM**
 
-Test names should describe what a user would observe, not what the code does internally. When a test fails, its name should immediately tell you what broke from the user's perspective. Group with `describe` blocks by feature, ordered from basic scenarios to edge cases.
+**Why:** Tests serve as living documentation. If someone can read just the test names and understand what the feature does, the tests are pulling double duty — verifying behavior _and_ documenting it. Implementation-focused names ("should call setIsExpanded") couple the documentation to internals and become misleading when the implementation changes.
+
+**How:** Name tests by what a user would observe, not what the code does internally. Group with `describe` blocks by feature, ordered from basic scenarios to edge cases. When a test fails, its name should immediately tell you what broke from the user's perspective.
 
 **Incorrect (implementation-focused names):**
 

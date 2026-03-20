@@ -8,7 +8,9 @@ tags: page-objects, BrowserPage, typing, composition
 
 **Impact: HIGH**
 
-A page object should add domain methods without hiding the underlying Playwright API. Using `Object.assign(page, self)` gives tests both the typed domain API (via the page object) and escape-hatch access to low-level Playwright methods when needed. The return type is inferred — no separate interface needed.
+**Why:** A page object should centralize domain interactions without hiding the underlying Playwright API. If the page object wraps the page, tests lose access to low-level methods for one-off queries that don't warrant a page object method. You want both: a typed domain API for common interactions, and escape-hatch access to raw Playwright when needed.
+
+**How:** Use `Object.assign(page, self)` to extend the browser page with domain methods. The return type is inferred — no separate interface needed.
 
 **Incorrect (wraps page, losing access to raw methods):**
 

@@ -1,16 +1,16 @@
 ---
 title: Use Custom Higher-Order Resolvers for Request Matching
 impact: CRITICAL
-tags: msw, resolvers, matching, precision
+tags: msw, resolvers, matching, precision, moto
 ---
 
 ## Use Custom Higher-Order Resolvers for Request Matching
 
 **Impact: CRITICAL**
 
-A handler that only matches on URL responds to any request to that endpoint, regardless of what the component actually sent. This gives false confidence — the test passes even if the component sends the wrong body or is missing an auth header. Higher-order resolvers add matching conditions (body content, headers, query params) so the handler only fires when the request is correct. If the component sends the wrong data, the request falls through and MSW's unhandled request error catches it.
+**Why:** MOTO says to mock at the boundary — but a handler that only matches on URL is a loose boundary. It responds to _any_ request to that endpoint regardless of what the component actually sent. This gives false confidence: the test passes even if the component sends the wrong body or is missing an auth header. A precise boundary mock should verify what crosses the boundary, not just where it goes.
 
-These are custom utility functions you write and keep in your shared MSW helpers. They wrap MSW's `HttpResponseResolver` type, returning `undefined` when the predicate doesn't match so MSW tries the next handler.
+**How:** Higher-order resolvers add matching conditions (body content, headers, query params) so the handler only fires when the request is correct. If the component sends the wrong data, the request falls through and MSW's unhandled request error catches it. These are custom utility functions you write and keep in your shared MSW helpers — they wrap MSW's `HttpResponseResolver` type, returning `undefined` when the predicate doesn't match so MSW tries the next handler.
 
 **Incorrect (matches any POST regardless of what was sent):**
 

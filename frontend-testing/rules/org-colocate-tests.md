@@ -8,9 +8,9 @@ tags: organization, colocation, file-structure
 
 **Impact: MEDIUM**
 
-Place test files next to the source files they test. A component at `src/components/user-card.tsx` gets its test at `src/components/user-card.test.tsx`. This makes it immediately obvious when a component lacks coverage and keeps related code close in the file tree.
+**Why:** When tests live in a separate directory tree, it's easy to lose track of which components have coverage and which don't. Colocation makes missing coverage immediately visible in the file tree and keeps related code close together for navigation.
 
-Test support infrastructure (fixtures, page objects, MSW setup, contract helpers) lives in a dedicated shared directory since it serves multiple test files.
+**How:** Place test files next to the source files they test. A component at `src/components/user-card.tsx` gets its test at `src/components/user-card.test.tsx`. Test support infrastructure (fixtures, page objects, MSW setup) lives in a dedicated shared directory since it serves multiple test files.
 
 **Incorrect (separate test directory mirrors source tree):**
 
@@ -29,5 +29,3 @@ src/components/user-card.test.tsx          # Right next to it
 src/components/search-bar.tsx
 src/components/search-bar.test.tsx
 ```
-
-The shared support directory (wherever the project places it) contains infrastructure that crosses feature boundaries: the MSW worker, page objects, fixture files, and API contract helpers.

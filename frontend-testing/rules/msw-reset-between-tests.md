@@ -1,14 +1,16 @@
 ---
 title: Reset Handlers and Clear Storage Between Tests
 impact: CRITICAL
-tags: msw, reset, isolation, cleanup
+tags: msw, reset, isolation, cleanup, moto
 ---
 
 ## Reset Handlers and Clear Storage Between Tests
 
 **Impact: CRITICAL**
 
-Handlers added via `browserWorker.use()` persist until explicitly reset. Without cleanup, one test's handlers leak into the next, causing order-dependent failures that are painful to debug. Reset handlers and clear any browser storage after every test.
+**Why:** Test isolation is non-negotiable. If one test's handlers leak into the next, you get order-dependent failures that are painful to debug — the test passes in isolation but fails in a suite, or vice versa. The MOTO principle only works when each test starts with a clean boundary: no leftover handlers, no stale storage.
+
+**How:** Reset MSW handlers and clear browser storage after every test. This belongs in the global browser setup file alongside the worker start, so it's automatic — you never forget and every test gets clean state.
 
 **Incorrect (no cleanup between tests):**
 
@@ -31,5 +33,3 @@ afterAll(() => {
   browserWorker.stop();
 });
 ```
-
-This belongs in the global browser setup file alongside the worker start. Having it global means you never forget — every test gets clean state automatically.

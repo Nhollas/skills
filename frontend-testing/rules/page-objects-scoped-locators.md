@@ -8,7 +8,9 @@ tags: page-objects, scoping, locators, self-reference
 
 **Impact: HIGH**
 
-Page object locators should scope within parent elements using self-references. This prevents false matches when the same role appears in multiple regions, and it documents the expected DOM hierarchy in a readable way.
+**Why:** Page objects that use flat, unscoped locators are vulnerable to the same false-match problem as unscoped locators in tests. When the same role appears in multiple regions, a flat locator can match the wrong element. Scoping within parent elements in the page object means the scoping logic lives in one place and every test that uses the page object gets it for free.
+
+**How:** Build locators that chain through parent elements using self-references. The `self.getParent()` pattern means if the parent's locator changes, every dependent locator updates automatically.
 
 **Incorrect (flat locators with no scoping):**
 
@@ -40,5 +42,3 @@ const self = {
         .getByText(/\d+ results/),
 };
 ```
-
-The self-referencing pattern (`self.getResultsPanel()`) means if the panel's locator changes, every dependent locator updates automatically.

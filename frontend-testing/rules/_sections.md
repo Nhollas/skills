@@ -1,36 +1,36 @@
 # Sections
 
-This file defines all sections, their ordering, impact levels, and descriptions.
+This file defines all sections, their ordering, and the principles they serve.
 The section ID (in parentheses) is the filename prefix used to group rules.
 
 ---
 
 ## 1. Locator Strategy (locators)
 
-**Impact:** CRITICAL
-**Description:** How tests find elements determines how fragile they are. Accessibility-based locators create a virtuous cycle where test coverage and accessibility coverage grow together, while CSS selectors and data-testid create a parallel naming system that drifts from the real UI.
+**Principle:** Find elements by role within UI regions.
+**Why:** Tests should query elements the way a user finds them — by what they are and where they are on the page. This survives refactors because markup implementation can change while the role and region stay the same.
+**How:** Combine `getByRole` with region scoping. When markup doesn't support this, suggest targeted semantic improvements.
 
-## 2. MSW Mocking (msw)
+## 2. Boundary Mocking (msw)
 
-**Impact:** CRITICAL
-**Description:** Every frontend test that touches a network boundary needs reliable, precise API mocking. MSW intercepts at the network level, giving tests realistic behavior without coupling to implementation details. Getting this wrong means flaky tests or false confidence.
+**Principle:** Mock outside, test outside (MOTO).
+**Why:** External dependencies should be mocked as close to the system boundary as possible, and assertions should happen as close to the consumer as possible. This ensures tests verify real behavior — the full client-side stack from fetch to render — without coupling to internal implementation.
+**How:** MSW intercepts at the network level (service worker), which is the outermost boundary in a browser app. Define happy-path handlers in a shared module, override per-test for specific scenarios.
 
 ## 3. Page Objects (page-objects)
 
-**Impact:** HIGH
-**Description:** Page objects centralize element knowledge so markup changes require updating one file instead of every test. A well-structured page object makes tests read like behavior specifications.
+**Principle:** Centralize element knowledge, expose behavior.
+**Why:** When markup changes, updating one page object is cheaper than updating every test that touches that element. A well-structured page object makes tests read like behavior specifications.
+**How:** Create page objects that extend `BrowserPage` via `Object.assign`, use consistent `get*/expect*/action` naming, and scope locators within parent elements.
 
-## 4. Component Markup (markup)
+## 4. Fixtures (fixtures)
 
-**Impact:** HIGH
-**Description:** Testability starts in the component. Semantic HTML with accessibility attributes gives tests a stable, meaningful surface to query against — and makes the app more accessible as a side effect.
+**Principle:** Declarative setup via the builder pattern and extension chain.
+**Why:** `beforeEach`/`afterEach` chains create implicit ordering and shared mutable state that makes tests fragile and hard to reason about. Declarative fixtures make dependencies explicit and only run when needed.
+**How:** Use Vitest's builder pattern (`.extend('name', ...)`) for automatic type inference, compose through the extension chain, and extend from a shared base per feature.
 
-## 5. Fixtures (fixtures)
+## 5. Test Organization (org)
 
-**Impact:** HIGH
-**Description:** Vitest fixtures provide composable, typed test setup that eliminates boilerplate while ensuring clean state between tests. They replace fragile beforeEach/afterEach chains with declarative dependencies.
-
-## 6. Test Organization (org)
-
-**Impact:** MEDIUM
-**Description:** Consistent file placement, naming, and structure make tests discoverable and maintainable as the codebase grows.
+**Principle:** Tests as living documentation.
+**Why:** Someone reading just the test names should understand what the feature does. The file structure should make it obvious where to find (or add) coverage.
+**How:** Colocate tests with source, name tests by observable behavior, use factory functions for test data, and separate unit/browser vitest projects.
