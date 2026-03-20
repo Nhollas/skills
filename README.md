@@ -1,6 +1,6 @@
 # Skills
 
-A collection of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills.
+My personal collection of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills.
 
 ## Available Skills
 
