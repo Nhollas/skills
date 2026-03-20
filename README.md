@@ -6,4 +6,4 @@ My personal collection of [Claude Code](https://docs.anthropic.com/en/docs/claud
 
 | Skill | Description |
 |-------|-------------|
-| [frontend-testing](./frontend-testing) | Frontend testing conventions using Vitest browser mode, Playwright, MSW, and accessibility-first patterns |
+| [frontend-testing](./frontend-testing) | Principles and patterns for writing frontend tests that are resilient to refactoring, readable as behavior specs, and fast to maintain |
