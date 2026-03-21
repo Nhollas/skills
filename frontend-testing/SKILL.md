@@ -86,13 +86,11 @@ When markup changes, you want to update one file instead of every test that touc
 - `page-objects-extend-page` - Extend BrowserPage with Object.assign for a typed domain API
 - `page-objects-scoped-locators` - Build locators that scope within parent elements
 
-### 4. Fixtures — declarative setup with explicit dependencies
+### 4. Fixtures — clean setup that keeps tests slim
 
-Vitest fixtures replace fragile `beforeEach`/`afterEach` chains with typed, composable setup that makes dependencies explicit. Use the builder pattern (`.extend('name', ...)`) for automatic type inference, and compose through the extension chain.
+Vitest fixtures keep all setup in one place, work naturally with page objects, and let tests focus purely on behavior.
 
-- `fixtures-test-extend` - Use the builder pattern for typed fixtures with automatic type inference
-- `fixtures-composition` - Compose fixtures through the extension chain with explicit dependencies
-- `fixtures-per-feature` - Extend the fixture chain per feature from a shared base
+- `fixtures-use-fixtures` - Use Vitest fixtures with deferred mounting for clean, composable test setup
 
 ### 5. Test Organization — tests as living documentation
 
