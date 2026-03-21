@@ -26,7 +26,6 @@ beforeAll(async () => {
 ```typescript
 afterEach(() => {
   browserWorker.resetHandlers();
-  window.sessionStorage.clear();
 });
 
 afterAll(() => {
